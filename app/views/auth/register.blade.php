@@ -4,7 +4,8 @@
     {{ Form::email('email'); }}
     {{ Form::password('password'); }}
     {{ Form::submit('Register'); }}
-
-    <div> {{ var_dump($errors->all()) }} </div>
+    <ul>
+        {{ implode('', $errors->all('<li>:message</li>')) }}
+    </ul>
 
 {{ Form::close(); }}

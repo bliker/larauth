@@ -2,8 +2,12 @@
 {{ Form::open(array('method' => 'AuthController@postForget')); }}
 
     {{ Form::email('email'); }}
-    {{ Form::submit('Register'); }}
+    {{ Form::submit('Restore Password'); }}
 
-    <div> {{ var_dump($errors->all()); }} </div>
+    <div>
+       @if (Session::has('error'))
+           {{ trans(Session::get('reason')) }}
+       @endif
+    </div>
 
 {{ Form::close(); }}
