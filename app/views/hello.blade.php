@@ -28,5 +28,7 @@
     <li><a href="auth/logout">Logout</a></li>
 </ul>
 
-</body>
+</body>s
+
 </html>
+
