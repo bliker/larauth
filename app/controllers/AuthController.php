@@ -4,16 +4,24 @@ use Illuminate\Support\MessageBag;
 
 class AuthController extends BaseController {
 
-    function __construct() {
+    function __construct()
+    {
         $this->beforeFilter('guest', array(
             'except' => array('getLogout')
         ));
     }
 
+    /**
+     * FOrm for registering new users
+     */
     public function getRegister()
     {
         return View::make('auth.register');
     }
+
+    /**
+     * Create user account and send activation email if neccessary
+     */
     public function postRegister()
     {
 
@@ -61,11 +69,18 @@ class AuthController extends BaseController {
         }
     }
 
-
+    /**
+     * Form for logging in the user
+     */
     public function getLogin()
     {
         return View::make('auth.login');
     }
+
+    /**
+     * Login user into the app
+     * @return Redirect
+     */
     public function postLogin()
     {
         $params = Input::only(array('email', 'password'));
@@ -87,13 +102,18 @@ class AuthController extends BaseController {
         }
     }
 
+    /**
+     * Logout the user
+     */
     public function getLogout()
     {
         Auth::logout();
-
         return Redirect::to('/')->with('message', 'Succesfully logged out');
     }
 
+    /**
+     * Form for reseting password
+     */
     public function getForgot()
     {
         $errors = $this->reminderErrors();
@@ -101,24 +121,40 @@ class AuthController extends BaseController {
                    ->withInput()
                    ->withErrors($errors);
     }
+    /**
+     * Create new password reminder and and an email with reset token
+     * @return Redirect
+     */
     public function postForgot()
     {
         return Password::remind(array('email'=>Input::get('email')));
     }
 
+    /**
+     * Form for setting new password, user should be linked here
+     * from their email
+     * @param  string $token Token from email
+     */
     public function getReset($token = null)
     {
         $errors = $this->reminderErrors();
-        return View::make('auth.reset')->with('token', $token);
+        return View::make('auth.reset')
+                   ->with('token', $token);
     }
+
+    /**
+     * Sets new password if correct token is provided
+     * @return Redirect
+     */
     public function postReset()
     {
         $credentials = compact(Input::get('email'));
-        $success = Password::reset($credentials, function($user, $password)
+        return Password::reset($credentials, function($user, $password)
         {
                 $user->password = Hash::make($password);
                 $user->save();
-                return true;
+                return Redirect::to('/')
+                                ->with('message', 'Your password was succesfuly reseted, you can now login');
         });
     }
 
