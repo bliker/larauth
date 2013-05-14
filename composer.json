@@ -2,7 +2,6 @@
 	"require": {
 		"laravel/framework": "4.0.*",
 		"way/generators": "1.0.*@dev"
-
 	},
 	"autoload": {
 		"classmap": [
