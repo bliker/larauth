@@ -96,23 +96,41 @@ class AuthController extends BaseController {
 
     public function getForgot()
     {
-        if (Session::has('success')) {
-
-        }
-        return View::make('auth.forgot');
+        $errors = $this->reminderErrors();
+        return View::make('auth.forgot')
+                   ->withInput()
+                   ->withErrors($errors);
     }
     public function postForgot()
     {
-       return Password::remind(array('email'=>Input::get('email')));
+        return Password::remind(array('email'=>Input::get('email')));
     }
 
-    public function getReset($token)
+    public function getReset($token = null)
     {
-
+        $errors = $this->reminderErrors();
+        return View::make('auth.reset')->with('token', $token);
     }
     public function postReset()
     {
+        $credentials = compact(Input::get('email'));
+        $success = Password::reset($credentials, function($user, $password)
+        {
+                $user->password = Hash::make($password);
+                $user->save();
+                return true;
+        });
+    }
 
+    protected function reminderErrors()
+    {
+        $errors = new MessageBag;
+        if (Session::has('error') ) {
+            $reason = trans(Session::get('reason'));
+            $errors->add('auth', $reason);
+        }
+
+        return $errors;
     }
 
     public function getActivate($email = null, $token = null)
